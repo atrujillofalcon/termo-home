@@ -9,12 +9,16 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
 import android.content.Intent
+import kotlinx.android.synthetic.main.display_temperature.*
+import java.text.DecimalFormat
+import java.time.LocalDateTime
 
 private val TAG = MainActivity::class.java.simpleName
 
 class MainActivity : Activity() {
 
     private lateinit var mSensorManager: SensorManager
+    private var lastReadSecond = 0
 
     private val mDynamicSensorCallback = object : DynamicSensorCallback() {
         override fun onDynamicSensorConnected(sensor: Sensor) {
@@ -30,9 +34,14 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.display_temperature)
+
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
         Log.i("SENSORS", "Sensor count ${sensors.size}")
+        for (s in sensors) {
+            Log.i("SENSORS", "Sensor name: ${s.name}")
+        }
         startTemperaturePressureRequest()
     }
 
@@ -56,7 +65,12 @@ class MainActivity : Activity() {
     private inner class TemperaturePressureEventListener : SensorEventListener {
 
         override fun onSensorChanged(event: SensorEvent) {
-            Log.i(TAG, "sensor changed: " + event.values[0])
+            val currentSecond = LocalDateTime.now().second
+            if (currentSecond != lastReadSecond && currentSecond % 5 == 0) {
+                temperatureText.text = "${DecimalFormat("##.##").format(event.values[0])} ºC"
+                Log.i(TAG, "sensor changed: " + event.values[0])
+                lastReadSecond = currentSecond
+            }
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {

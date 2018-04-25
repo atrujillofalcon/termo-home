@@ -11,7 +11,7 @@ import com.google.android.things.pio.PeripheralManager
 import java.io.IOException
 
 private val TAG = TemperaturePressureService::class.java.simpleName
-private val I2C_BUS = "BUS NAME"
+private val I2C_BUS = "I2C1"
 
 /**
  * To use this service, start it from your component (like an activity):
