@@ -1,4 +1,4 @@
-package es.atrujillo.iot.android
+package es.atrujillo.iot.android.activity
 
 import android.app.Activity
 import android.os.Bundle
@@ -9,6 +9,9 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
 import android.content.Intent
+import es.atrujillo.iot.android.R
+import es.atrujillo.iot.android.networking.TPLinkServiceClient
+import es.atrujillo.iot.android.service.TemperaturePressureService
 import kotlinx.android.synthetic.main.display_temperature.*
 import java.text.DecimalFormat
 import java.time.LocalDateTime
@@ -35,6 +38,8 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.display_temperature)
+
+        val token = TPLinkServiceClient().getTPLinkToken("atrujillo92work@gmail.com", "forKasa#13")
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)

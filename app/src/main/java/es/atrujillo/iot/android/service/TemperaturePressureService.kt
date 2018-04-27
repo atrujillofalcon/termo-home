@@ -1,4 +1,4 @@
-package es.atrujillo.iot.android
+package es.atrujillo.iot.android.service
 
 import android.app.Service
 import android.content.Intent
@@ -6,7 +6,6 @@ import android.os.IBinder
 import android.util.Log
 
 import com.google.android.things.contrib.driver.bmx280.Bmx280SensorDriver
-import com.google.android.things.pio.PeripheralManager
 
 import java.io.IOException
 
