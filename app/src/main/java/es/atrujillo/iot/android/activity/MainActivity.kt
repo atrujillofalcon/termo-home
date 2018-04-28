@@ -12,6 +12,8 @@ import android.content.Intent
 import es.atrujillo.iot.android.R
 import es.atrujillo.iot.android.extension.logError
 import es.atrujillo.iot.android.extension.logInfo
+import es.atrujillo.iot.android.model.TPLinkDevicesRequest
+import es.atrujillo.iot.android.model.TPLinkDevicesResponse
 import es.atrujillo.iot.android.model.TPLinkLoginResponse
 import es.atrujillo.iot.android.networking.MoshiConverterHolder
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
@@ -47,23 +49,26 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.display_temperature)
 
-        TPLinkServiceClient().getTPLinkToken("atrujillo92work@gmail.com",
-                "forKasa#13", object : Callback {
-            override fun onFailure(call: Call, e: IOException?) {
-                logError("Error getting token", e)
-            }
+        TPLinkServiceClient().getDeviceList("atrujillo92work@gmail.com", "forKasa#13",
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        logError("Error getting devices", e)
+                    }
 
-            override fun onResponse(call: Call, response: Response) {
-                var responseBody = response.body()?.string()
-                logInfo(responseBody)
-                val token = MoshiConverterHolder.createMoshiConverter()
-                        .adapter(TPLinkLoginResponse::class.java)
-                        .fromJson(responseBody)
-                        ?.result?.token
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful && response.body() != null) {
+                            val responseBody = response.body()
+                            if (responseBody != null) {
+                                val devices = MoshiConverterHolder.createMoshiConverter()
+                                        .adapter(TPLinkDevicesResponse::class.java)
+                                        .fromJson(responseBody.string())
+                                        ?.result?.deviceList
 
-                logInfo("TOKEN: $token")
-            }
-        })
+                                logInfo("Devices: $devices")
+                            }
+                        }
+                    }
+                })
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)

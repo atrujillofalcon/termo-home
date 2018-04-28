@@ -6,4 +6,6 @@ interface TPLinkService {
 
     fun getTPLinkToken(user: String, pass: String, callback: Callback)
 
+    fun getDeviceList(user: String, pass: String, callback: Callback)
+
 }
