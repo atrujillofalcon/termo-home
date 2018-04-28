@@ -4,13 +4,11 @@ import es.atrujillo.iot.android.extension.logError
 import es.atrujillo.iot.android.model.TPLinkLoginParams
 import es.atrujillo.iot.android.model.TPLinkLoginRequest
 import es.atrujillo.iot.android.model.TPLinkLoginResponse
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.*
 
 class TPLinkServiceClient : TPLinkService {
 
-    override fun getTPLinkToken(user: String, pass: String): String? {
+    override fun getTPLinkToken(user: String, pass: String, callback: Callback) {
         val tokenMoshi = MoshiConverterHolder.createMoshiConverter()
                 .adapter(TPLinkLoginRequest::class.java)
         val request = TPLinkLoginRequest(params = TPLinkLoginParams(cloudUserName = user, cloudPassword = pass))
@@ -22,17 +20,9 @@ class TPLinkServiceClient : TPLinkService {
                 .post(body)
                 .build()
 
-        var tokenResponse: TPLinkLoginResponse? = null
-        try {
-            val responseMoshi = MoshiConverterHolder.createMoshiConverter()
-                    .adapter(TPLinkLoginResponse::class.java)
-            tokenResponse = responseMoshi.fromJson(TPLinkHttpClientHolder.httpClient.newCall(okRequest).execute()
-                    .body().toString())
-        } catch (e: Throwable) {
-            logError(e.localizedMessage, e)
-        }
+        val responseMoshi = MoshiConverterHolder.createMoshiConverter().adapter(TPLinkLoginResponse::class.java)
+        return TPLinkHttpClientHolder.httpClient.newCall(okRequest).enqueue(callback)
 
-        return tokenResponse?.result?.token
     }
 
     companion object {

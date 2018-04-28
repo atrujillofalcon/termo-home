@@ -10,9 +10,17 @@ import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
 import android.content.Intent
 import es.atrujillo.iot.android.R
+import es.atrujillo.iot.android.extension.logError
+import es.atrujillo.iot.android.extension.logInfo
+import es.atrujillo.iot.android.model.TPLinkLoginResponse
+import es.atrujillo.iot.android.networking.MoshiConverterHolder
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
 import kotlinx.android.synthetic.main.display_temperature.*
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.Response
+import java.io.IOException
 import java.text.DecimalFormat
 import java.time.LocalDateTime
 
@@ -39,7 +47,23 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.display_temperature)
 
-        val token = TPLinkServiceClient().getTPLinkToken("atrujillo92work@gmail.com", "forKasa#13")
+        TPLinkServiceClient().getTPLinkToken("atrujillo92work@gmail.com",
+                "forKasa#13", object : Callback {
+            override fun onFailure(call: Call, e: IOException?) {
+                logError("Error getting token", e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                var responseBody = response.body()?.string()
+                logInfo(responseBody)
+                val token = MoshiConverterHolder.createMoshiConverter()
+                        .adapter(TPLinkLoginResponse::class.java)
+                        .fromJson(responseBody)
+                        ?.result?.token
+
+                logInfo("TOKEN: $token")
+            }
+        })
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
