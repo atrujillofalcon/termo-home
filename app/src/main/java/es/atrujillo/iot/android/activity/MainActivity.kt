@@ -16,6 +16,7 @@ import es.atrujillo.iot.android.model.TPLinkDevicesRequest
 import es.atrujillo.iot.android.model.TPLinkDevicesResponse
 import es.atrujillo.iot.android.model.TPLinkLoginResponse
 import es.atrujillo.iot.android.networking.MoshiConverterHolder
+import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
 import kotlinx.android.synthetic.main.display_temperature.*
@@ -49,7 +50,7 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.display_temperature)
 
-        TPLinkServiceClient().getDeviceList("atrujillo92work@gmail.com", "forKasa#13",
+        /*TPLinkServiceClient().getDeviceList("atrujillo92work@gmail.com", "forKasa#13",
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
                         logError("Error getting devices", e)
@@ -68,7 +69,10 @@ class MainActivity : Activity() {
                             }
                         }
                     }
-                })
+                })*/
+
+        TPLinkServiceClient().setDeviceState("atrujillo92work@gmail.com", "forKasa#13",
+                "80067F946249F000A801A5F6014BF033172B236D",TPLinkService.TpLinkState.OFF)
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
