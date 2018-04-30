@@ -1,35 +1,27 @@
 package es.atrujillo.iot.android.activity
 
 import android.app.Activity
-import android.os.Bundle
-import android.util.Log
+import android.content.Intent
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
-import android.content.Intent
+import android.os.Bundle
+import com.google.firebase.database.FirebaseDatabase
 import es.atrujillo.iot.android.R
-import es.atrujillo.iot.android.extension.logError
 import es.atrujillo.iot.android.extension.logInfo
-import es.atrujillo.iot.android.model.TPLinkDevicesRequest
-import es.atrujillo.iot.android.model.TPLinkDevicesResponse
-import es.atrujillo.iot.android.model.TPLinkLoginResponse
-import es.atrujillo.iot.android.networking.MoshiConverterHolder
+import es.atrujillo.iot.android.model.TermoHistoricData
 import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
 import kotlinx.android.synthetic.main.display_temperature.*
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.Response
-import java.io.IOException
 import java.text.DecimalFormat
+import java.time.Instant
 import java.time.LocalDateTime
 
-private val TAG = MainActivity::class.java.simpleName
 
-class MainActivity : Activity() {
+class TempoIotActivity : Activity() {
 
     private lateinit var mSensorManager: SensorManager
     private var lastReadSecond = 0
@@ -37,7 +29,7 @@ class MainActivity : Activity() {
     private val mDynamicSensorCallback = object : DynamicSensorCallback() {
         override fun onDynamicSensorConnected(sensor: Sensor) {
             if (sensor.type == Sensor.TYPE_AMBIENT_TEMPERATURE) {
-                Log.i(TAG, "Temperature sensor connected")
+                logInfo("Temperature sensor connected")
                 mSensorEventListener = TemperaturePressureEventListener()
                 mSensorManager.registerListener(mSensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
@@ -72,13 +64,13 @@ class MainActivity : Activity() {
                 })*/
 
         TPLinkServiceClient().setDeviceState("atrujillo92work@gmail.com", "forKasa#13",
-                "80067F946249F000A801A5F6014BF033172B236D",TPLinkService.TpLinkState.OFF)
+                "80067F946249F000A801A5F6014BF033172B236D", TPLinkService.TpLinkState.OFF)
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
-        Log.i("SENSORS", "Sensor count ${sensors.size}")
+        logInfo("Sensor count ${sensors.size}")
         for (s in sensors) {
-            Log.i("SENSORS", "Sensor name: ${s.name}")
+            logInfo("Sensor name: ${s.name}")
         }
         startTemperaturePressureRequest()
     }
@@ -103,16 +95,27 @@ class MainActivity : Activity() {
     private inner class TemperaturePressureEventListener : SensorEventListener {
 
         override fun onSensorChanged(event: SensorEvent) {
-            val currentSecond = LocalDateTime.now().second
+            val now = LocalDateTime.now()
+            val currentSecond = now.second
             if (currentSecond != lastReadSecond && currentSecond % 5 == 0) {
                 temperatureText.text = "${DecimalFormat("##.##").format(event.values[0])} ºC"
-                Log.i(TAG, "sensor changed: " + event.values[0])
+                logInfo("sensor changed: ${event.values[0]}")
                 lastReadSecond = currentSecond
+
+                val database = FirebaseDatabase.getInstance()
+                val tempRef = database.getReference("temperature")
+                tempRef.setValue(event.values[0])
+
+                //grabamos el histórico cada 1h
+                if (now.minute == 0) {
+                    val newHistoricEntry = database.getReference("historic").child("data").push()
+                    newHistoricEntry.setValue(TermoHistoricData(Instant.now().toEpochMilli(), event.values[0]))
+                }
             }
         }
 
         override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
-            Log.i(TAG, "sensor accuracy changed: " + accuracy)
+            logInfo("sensor accuracy changed: $accuracy")
         }
     }
 

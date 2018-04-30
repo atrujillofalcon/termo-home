@@ -8,7 +8,7 @@ import java.io.IOException
 
 class TPLinkServiceClient : TPLinkService {
 
-    override fun getTPLinkToken(user: String, pass: String, callback: Callback) {
+    override fun getTPLinkToken(user: String , pass: String, callback: Callback) {
         val tokenMoshi = MoshiConverterHolder.createMoshiConverter()
                 .adapter(TPLinkLoginRequest::class.java)
         val request = TPLinkLoginRequest(params = TPLinkLoginParams(cloudUserName = user, cloudPassword = pass))

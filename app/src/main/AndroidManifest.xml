@@ -9,13 +9,14 @@
 
 
     <application
+        android:name=".config.TermoHomeApplication"
         android:testOnly="false"
         >
         <uses-library android:name="com.google.android.things" />
 
         <service android:name=".service.TemperaturePressureService" />
 
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.TempoIotActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
