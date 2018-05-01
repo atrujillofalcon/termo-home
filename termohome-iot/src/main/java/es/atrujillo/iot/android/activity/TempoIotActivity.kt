@@ -145,6 +145,9 @@ class TempoIotActivity : Activity(), ValueEventListener {
         when (key) {
             FirebaseKeys.LIMITS -> limits = snapshot.getValue(LimitData::class.java)
             FirebaseKeys.POWER -> {
+                if (powerOn != null)
+                    lastChangeState = LocalDateTime.now()  //ignoramos la primera vez
+
                 powerOn = snapshot.getValue(Boolean::class.java)
                 if (powerOn as Boolean) {
                     TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
@@ -153,7 +156,6 @@ class TempoIotActivity : Activity(), ValueEventListener {
                     TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
                             newState = TPLinkService.TpLinkState.OFF)
                 }
-                lastChangeState = LocalDateTime.from(Instant.now())
             }
             FirebaseKeys.IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java)!!
             FirebaseKeys.OTHER -> logWarn("Not found firebase key ${snapshot.key}")
