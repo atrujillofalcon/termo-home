@@ -2,7 +2,8 @@ package es.atrujillo.iot.android.networking
 
 import es.atrujillo.iot.android.extension.logError
 import es.atrujillo.iot.android.extension.logInfo
-import es.atrujillo.iot.android.model.*
+import es.atrujillo.iot.android.model.firebase.LimitData
+import es.atrujillo.iot.android.model.tplink.*
 import okhttp3.*
 import java.io.IOException
 
@@ -104,11 +105,32 @@ class TPLinkServiceClient : TPLinkService {
                                 })
                     }
                 }
-
                 throw Exception("Error in obtained response getting token")
             }
         })
     }
+
+    //GET DEVICES EXAMPLE
+    /*TPLinkServiceClient().getDeviceList("atrujillo92work@gmail.com", "forKasa#13",
+                object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        logError("Error getting devices", e)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        if (response.isSuccessful && response.body() != null) {
+                            val responseBody = response.body()
+                            if (responseBody != null) {
+                                val devices = MoshiConverterHolder.createMoshiConverter()
+                                        .adapter(TPLinkDevicesResponse::class.java)
+                                        .fromJson(responseBody.string())
+                                        ?.result?.deviceList
+
+                                logInfo("Devices: $devices")
+                            }
+                        }
+                    }
+                })*/
 
     companion object {
         const val BASE_TPLINK_URL = "https://wap.tplinkcloud.com"

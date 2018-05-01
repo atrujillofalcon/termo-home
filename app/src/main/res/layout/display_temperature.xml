@@ -6,7 +6,7 @@
 
     <TextView
         android:layout_margin="160dp"
-        android:id="@+id/temperatureText"
+        android:id="@+id/temperatureTV"
         android:textColor="#1a37dc"
         android:textSize="90sp"
         android:layout_width="match_parent"
