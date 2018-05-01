@@ -104,16 +104,12 @@ class TempoIotActivity : Activity(), ValueEventListener {
 
     private fun processTemperatureData(tempValue: Float) {
         if (limits != null && powerOn != null) {
-            //si está encendido y la temperatura está en los rangos normales
+            //si está encendido y la temperatura está en los rangos normales activar trigger
             if (powerOn as Boolean && tempValue in limits!!.min..limits!!.max) {
-                TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
-                        newState = TPLinkService.TpLinkState.OFF)
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
             else if (!powerOn!! && (tempValue < limits!!.min || tempValue > limits!!.max)) {
-                TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
-                        newState = TPLinkService.TpLinkState.ON)
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(true)
             }
         }
@@ -139,7 +135,16 @@ class TempoIotActivity : Activity(), ValueEventListener {
         val key = FirebaseKeys.buildFromKey(snapshot.key)
         when (key) {
             FirebaseKeys.LIMITS -> limits = snapshot.getValue(LimitData::class.java)
-            FirebaseKeys.POWER -> powerOn = snapshot.getValue(Boolean::class.java)
+            FirebaseKeys.POWER -> {
+                powerOn = snapshot.getValue(Boolean::class.java)
+                if (powerOn as Boolean) {
+                    TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
+                            newState = TPLinkService.TpLinkState.ON)
+                } else {
+                    TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
+                            newState = TPLinkService.TpLinkState.OFF)
+                }
+            }
             FirebaseKeys.OTHER -> logWarn("Not found firebase key ${snapshot.key}")
         }
     }

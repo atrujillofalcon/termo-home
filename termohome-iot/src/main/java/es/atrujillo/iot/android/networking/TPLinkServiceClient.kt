@@ -2,7 +2,6 @@ package es.atrujillo.iot.android.networking
 
 import es.atrujillo.iot.android.extension.logError
 import es.atrujillo.iot.android.extension.logInfo
-import es.atrujillo.iot.android.model.firebase.LimitData
 import es.atrujillo.iot.android.model.tplink.*
 import okhttp3.*
 import java.io.IOException
