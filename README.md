@@ -11,6 +11,6 @@ Proyecto para mantener la temperatura de la casa en unos rangos
 ### Instalación Módulo Android Things ###
 
 * adb uninstall es.atrujillo.iot.android
-* adb push app/release/app-release.apk /data/local/tmp/es.atrujillo.iot.android
+* adb push termohome-iot/release/termohome-iot-release.apk /data/local/tmp/es.atrujillo.iot.android
 * adb shell pm install -g -t -r "/data/local/tmp/es.atrujillo.iot.android"
 * Reiniciar dispositivo

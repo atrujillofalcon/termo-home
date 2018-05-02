@@ -9,7 +9,7 @@
 
 
     <application
-        android:name=".config.TermoHomeApplication"
+        android:name=".config.TermoHomeIOT"
         android:testOnly="false"
         >
         <uses-library android:name="com.google.android.things" />
