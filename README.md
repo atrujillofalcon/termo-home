@@ -6,9 +6,11 @@ Proyecto para mantener la temperatura de la casa en unos rangos
 
 * Quick summary
 * Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
 
-### InstalaciÃ³n MÃ³dulo Android Things ###
+Obtener historico:
+https://enhanced-layout-677.firebaseio.com/historic.json
+
+### Instalación Módulo Android Things ###
 
 * adb uninstall es.atrujillo.iot.android
 * adb push termohome-iot/release/termohome-iot-release.apk /data/local/tmp/es.atrujillo.iot.android
