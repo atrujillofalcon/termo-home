@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.View
 import android.widget.Switch
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,9 +16,7 @@ import kotlinx.android.synthetic.main.activity_termo.*
 import java.text.DecimalFormat
 
 
-class TermoActivity : AppCompatActivity(), ValueEventListener {
-
-    private var powerState: Boolean? = null
+class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListener {
 
     private var temperature: Float? = null
 
@@ -31,11 +30,8 @@ class TermoActivity : AppCompatActivity(), ValueEventListener {
         FirebaseDatabase.getInstance().getReference("power_on").addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference("active").addValueEventListener(this)
 
-        activeSwitch.setOnClickListener({
-            if (it is Switch) {
-                FirebaseDatabase.getInstance().getReference("active").setValue(it.isChecked)
-            }
-        })
+        activeSwitch.setOnClickListener(this)
+        stateSwitch.setOnClickListener(this)
     }
 
     override fun onCancelled(e: DatabaseError) {
@@ -53,8 +49,18 @@ class TermoActivity : AppCompatActivity(), ValueEventListener {
             "active" -> {
                 activeSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
                 activeSwitch.invalidate()
+
+                stateSwitch.isEnabled = !activeSwitch.isChecked
+                stateSwitch.invalidate()
             }
             else -> Log.w("TermoActivity", "Not found Firebase key")
+        }
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.activeSwitch -> FirebaseDatabase.getInstance().getReference("active").setValue((v as Switch).isChecked)
+            R.id.stateSwitch -> FirebaseDatabase.getInstance().getReference("power_on").setValue((v as Switch).isChecked)
         }
     }
 }
