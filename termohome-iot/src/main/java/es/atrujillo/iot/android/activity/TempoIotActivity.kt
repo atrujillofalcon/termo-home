@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import es.atrujillo.iot.android.R
+import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
 import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_IDLE_KEY
 import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
 import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_POWER_KEY
@@ -38,6 +39,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
 
     private var limits: LimitData? = null
     private var powerOn: Boolean? = null
+    private var isEngineActive: Boolean? = null
     private var idleInterval: Long = 30
 
     private val mDynamicSensorCallback = object : DynamicSensorCallback() {
@@ -59,6 +61,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
         FirebaseDatabase.getInstance().getReference(FIREBASE_LIMITS_KEY).addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference(FIREBASE_IDLE_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FIREBASE_ACTIVE_KEY).addValueEventListener(this)
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
@@ -108,7 +111,8 @@ class TempoIotActivity : Activity(), ValueEventListener {
     }
 
     private fun processTemperatureData(tempValue: Float) {
-        if (limits != null && powerOn != null) {
+        val engineActive = if (isEngineActive != null) isEngineActive!! else false
+        if (engineActive && limits != null && powerOn != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
             if (isIdleIntervalDone() && powerOn as Boolean && tempValue in limits!!.min..limits!!.max) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
@@ -158,17 +162,19 @@ class TempoIotActivity : Activity(), ValueEventListener {
                 }
             }
             FirebaseKeys.IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java)!!
+            FirebaseKeys.ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)!!
             FirebaseKeys.OTHER -> logWarn("Not found firebase key ${snapshot.key}")
         }
     }
 
     private enum class FirebaseKeys(val key: String) {
-        LIMITS("limits"), POWER("power_on"), IDLE_INTERVAL("idle_interval"), OTHER("other");
+        LIMITS("limits"), POWER("power_on"), IDLE_INTERVAL("idle_interval"), ACTIVE("active"), OTHER("other");
 
         companion object {
             const val FIREBASE_LIMITS_KEY = "limits"
             const val FIREBASE_POWER_KEY = "power_on"
             const val FIREBASE_IDLE_KEY = "idle_interval"
+            const val FIREBASE_ACTIVE_KEY = "active"
 
             fun buildFromKey(key: String) =
                     FirebaseKeys.values().filter { it.key == key }.getOrElse(0, { OTHER })
