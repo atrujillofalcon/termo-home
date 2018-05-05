@@ -113,5 +113,11 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/toChartsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Grafico de temperatura" />
+
 
 </LinearLayout>

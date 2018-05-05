@@ -32,6 +32,7 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
 
         activeSwitch.setOnClickListener(this)
         stateSwitch.setOnClickListener(this)
+        toChartsButton.setOnClickListener(this)
     }
 
     override fun onCancelled(e: DatabaseError) {
@@ -61,6 +62,7 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
         when (v.id) {
             R.id.activeSwitch -> FirebaseDatabase.getInstance().getReference("active").setValue((v as Switch).isChecked)
             R.id.stateSwitch -> FirebaseDatabase.getInstance().getReference("power_on").setValue((v as Switch).isChecked)
+            R.id.toChartsButton -> startActivity(Intent(this, TermoChartActivity::class.java))
         }
     }
 }
