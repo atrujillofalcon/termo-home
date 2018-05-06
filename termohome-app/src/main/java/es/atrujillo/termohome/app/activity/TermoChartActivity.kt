@@ -4,9 +4,16 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import es.atrujillo.termohome.app.R
 import es.atrujillo.termohome.app.math.HistoricToEntryProcessor
 import es.atrujillo.termohome.common.model.firebase.TermoHistoricCalendarData
+import es.atrujillo.termohome.common.model.firebase.TermoHistoricRawData
+import kotlinx.android.synthetic.main.activity_chart.*
+import kotlinx.android.synthetic.main.content_termo_chart.*
 import java.util.*
 import java.util.stream.Collectors
 

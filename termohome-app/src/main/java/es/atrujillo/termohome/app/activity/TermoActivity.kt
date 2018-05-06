@@ -6,8 +6,18 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Switch
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import es.atrujillo.termohome.app.R
 import es.atrujillo.termohome.app.service.PowerStateChangeObserver
+import es.atrujillo.termohome.common.extension.logWarn
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_POWER_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_TEMPERATURE_KEY
+import kotlinx.android.synthetic.main.activity_termo.*
 import java.text.DecimalFormat
 
 
@@ -21,9 +31,9 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
 
         startService(Intent(this, PowerStateChangeObserver::class.java))
 
-        FirebaseDatabase.getInstance().getReference("temperature").addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference("power_on").addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference("active").addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FIREBASE_TEMPERATURE_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FIREBASE_ACTIVE_KEY).addValueEventListener(this)
 
         activeSwitch.setOnClickListener(this)
         stateSwitch.setOnClickListener(this)
@@ -31,18 +41,19 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
     }
 
     override fun onCancelled(e: DatabaseError) {
-        Log.e("TermoActivity", e.message)
+        logWarn(e.message)
     }
 
     override fun onDataChange(snapshot: DataSnapshot) {
-        when (snapshot.key) {
-            "temperature" -> {
+        val key = FirebaseKeys.buildFromKey(snapshot.key)
+        when (key) {
+            FirebaseKeys.TEMPERATURE -> {
                 temperature = snapshot.getValue(Float::class.java)
                 if (temperature != null)
                     temperatureTV.text = "${DecimalFormat("##.##").format(temperature)} ºC"
             }
-            "power_on" -> stateSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
-            "active" -> {
+            FirebaseKeys.POWER -> stateSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
+            FirebaseKeys.ACTIVE -> {
                 activeSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
                 activeSwitch.invalidate()
 
