@@ -9,7 +9,7 @@
 
 
     <application
-        android:name=".config.TermoHomeIOT"
+        android:name="es.atrujillo.termohome.common.config.TermoHomeFirebaseApp"
         android:testOnly="false"
         >
         <uses-library android:name="com.google.android.things" />

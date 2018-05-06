@@ -1,12 +1,12 @@
-package es.atrujillo.iot.android.config
+package es.atrujillo.termohome.common.config
 
 import android.app.Application
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import es.atrujillo.iot.android.extension.logInfo
+import es.atrujillo.termohome.common.extension.logInfo
 
 
-class TermoHomeIOT : Application() {
+class TermoHomeFirebaseApp : Application() {
 
     override fun onCreate() {
         super.onCreate()

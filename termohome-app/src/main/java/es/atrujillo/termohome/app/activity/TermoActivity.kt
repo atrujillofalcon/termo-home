@@ -6,13 +6,8 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Switch
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import es.atrujillo.termohome.app.R
 import es.atrujillo.termohome.app.service.PowerStateChangeObserver
-import kotlinx.android.synthetic.main.activity_termo.*
 import java.text.DecimalFormat
 
 
@@ -56,6 +51,12 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
             }
             else -> Log.w("TermoActivity", "Not found Firebase key")
         }
+
+        if (loader.visibility != View.GONE) {
+            loader.visibility = View.GONE
+            viewsContainer.visibility = View.VISIBLE
+        }
+
     }
 
     override fun onClick(v: View) {

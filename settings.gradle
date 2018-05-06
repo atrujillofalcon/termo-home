@@ -1,1 +1,1 @@
-include ':termohome-iot', ':termohome-app'
+include ':termohome-iot', ':termohome-app', ':termohome-common'

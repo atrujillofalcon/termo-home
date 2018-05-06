@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/TermoHome.iml" filepath="$PROJECT_DIR$/TermoHome.iml" />
+      <module fileurl="file://$PROJECT_DIR$/termohome-app/termohome-app.iml" filepath="$PROJECT_DIR$/termohome-app/termohome-app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/termohome-common/termohome-common.iml" filepath="$PROJECT_DIR$/termohome-common/termohome-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/termohome-iot/termohome-iot.iml" filepath="$PROJECT_DIR$/termohome-iot/termohome-iot.iml" />
+    </modules>
+  </component>
+</project>

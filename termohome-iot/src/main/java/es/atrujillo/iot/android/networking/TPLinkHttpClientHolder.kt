@@ -1,6 +1,6 @@
 package es.atrujillo.iot.android.networking
 
-import es.atrujillo.iot.android.extension.logInfo
+import es.atrujillo.termohome.common.extension.logInfo
 import okhttp3.Authenticator
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit

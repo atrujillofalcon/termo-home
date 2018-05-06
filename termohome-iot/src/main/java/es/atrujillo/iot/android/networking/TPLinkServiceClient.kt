@@ -1,8 +1,8 @@
 package es.atrujillo.iot.android.networking
 
-import es.atrujillo.iot.android.extension.logError
-import es.atrujillo.iot.android.extension.logInfo
 import es.atrujillo.iot.android.model.tplink.*
+import es.atrujillo.termohome.common.extension.logError
+import es.atrujillo.termohome.common.extension.logInfo
 import okhttp3.*
 import java.io.IOException
 

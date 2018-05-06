@@ -8,22 +8,19 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
 import android.os.Bundle
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import es.atrujillo.iot.android.R
-import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
-import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_IDLE_KEY
-import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
-import es.atrujillo.iot.android.activity.TempoIotActivity.FirebaseKeys.Companion.FIREBASE_POWER_KEY
-import es.atrujillo.iot.android.extension.logInfo
-import es.atrujillo.iot.android.extension.logWarn
-import es.atrujillo.iot.android.model.firebase.LimitData
-import es.atrujillo.iot.android.model.firebase.TermoHistoricData
 import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
+import es.atrujillo.termohome.common.extension.logInfo
+import es.atrujillo.termohome.common.extension.logWarn
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_IDLE_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_POWER_KEY
+import es.atrujillo.termohome.common.model.firebase.LimitData
+import es.atrujillo.termohome.common.model.firebase.TermoHistoricRawData
 import kotlinx.android.synthetic.main.display_temperature.*
 import java.text.DecimalFormat
 import java.time.Instant
@@ -132,7 +129,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
         //grabamos el histórico cada 1h
         if (now.minute == 0) {
             val newHistoricEntry = database.getReference("historic").child("data").push()
-            newHistoricEntry.setValue(TermoHistoricData(Instant.now().toEpochMilli(), tempValue))
+            newHistoricEntry.setValue(TermoHistoricRawData(Instant.now().toEpochMilli(), tempValue))
         }
     }
 
@@ -167,17 +164,4 @@ class TempoIotActivity : Activity(), ValueEventListener {
         }
     }
 
-    private enum class FirebaseKeys(val key: String) {
-        LIMITS("limits"), POWER("power_on"), IDLE_INTERVAL("idle_interval"), ACTIVE("active"), OTHER("other");
-
-        companion object {
-            const val FIREBASE_LIMITS_KEY = "limits"
-            const val FIREBASE_POWER_KEY = "power_on"
-            const val FIREBASE_IDLE_KEY = "idle_interval"
-            const val FIREBASE_ACTIVE_KEY = "active"
-
-            fun buildFromKey(key: String) =
-                    FirebaseKeys.values().filter { it.key == key }.getOrElse(0, { OTHER })
-        }
-    }
 }

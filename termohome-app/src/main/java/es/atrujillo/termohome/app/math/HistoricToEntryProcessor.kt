@@ -1,7 +1,7 @@
 package es.atrujillo.termohome.app.math
 
 import com.github.mikephil.charting.data.Entry
-import es.atrujillo.termohome.app.model.firebase.TermoHistoricCalendarData
+import es.atrujillo.termohome.common.model.firebase.TermoHistoricCalendarData
 import java.util.*
 import java.util.stream.Collectors
 

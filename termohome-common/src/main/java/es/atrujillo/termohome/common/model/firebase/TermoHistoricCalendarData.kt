@@ -1,4 +1,4 @@
-package es.atrujillo.termohome.app.model.firebase
+package es.atrujillo.termohome.common.model.firebase
 
 import java.util.*
 

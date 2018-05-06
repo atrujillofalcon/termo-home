@@ -4,120 +4,135 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <ProgressBar
+        android:id="@+id/loader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="128dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Temperatura:"
-            android:textColor="#1a37dc"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/temperatureTV"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#1a37dc"
-            android:textSize="16sp" />
-
-    </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/viewsContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Min:"
-            android:textColor="#1a37dc"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/minTV"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#1a37dc"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Max:"
-            android:textColor="#1a37dc"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/maxTV"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textColor="#1a37dc"
-            android:textSize="16sp" />
+            android:layout_margin="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Temperatura:"
+                android:textColor="#1a37dc"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/temperatureTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:textColor="#1a37dc"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Min:"
+                android:textColor="#1a37dc"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/minTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:textColor="#1a37dc"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Max:"
+                android:textColor="#1a37dc"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/maxTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:textColor="#1a37dc"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Activado:"
+                android:textColor="#1a37dc"
+                android:textSize="24sp" />
+
+            <Switch
+                android:id="@+id/activeSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Estado:"
+                android:textColor="#1a37dc"
+                android:textSize="24sp" />
+
+            <Switch
+                android:id="@+id/stateSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:enabled="false" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/toChartsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Grafico de temperatura" />
 
     </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Activado:"
-            android:textColor="#1a37dc"
-            android:textSize="24sp" />
-
-        <Switch
-            android:id="@+id/activeSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Estado:"
-            android:textColor="#1a37dc"
-            android:textSize="24sp" />
-
-        <Switch
-            android:id="@+id/stateSwitch"
-            android:enabled="false"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/toChartsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Grafico de temperatura" />
-
-
 </LinearLayout>

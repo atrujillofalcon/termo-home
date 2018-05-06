@@ -1,20 +1,12 @@
 package es.atrujillo.termohome.app.activity
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import es.atrujillo.termohome.app.R
 import es.atrujillo.termohome.app.math.HistoricToEntryProcessor
-import es.atrujillo.termohome.app.model.firebase.TermoHistoricCalendarData
-import es.atrujillo.termohome.app.model.firebase.TermoHistoricRawData
-import kotlinx.android.synthetic.main.activity_chart.*
-import kotlinx.android.synthetic.main.content_termo_chart.*
+import es.atrujillo.termohome.common.model.firebase.TermoHistoricCalendarData
 import java.util.*
 import java.util.stream.Collectors
 
@@ -27,11 +19,6 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chart)
         setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         FirebaseDatabase.getInstance()
@@ -55,7 +42,7 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
                 .map { TermoHistoricCalendarData(getCalendarFromEpoch(it!!.ms), it.temperature) }
 
         val dataset = LineDataSet(HistoricToEntryProcessor.getMonthlyEntries(historicCaledar, Calendar.getInstance()),
-                "Label")
+                "Temperatura Promedio Diaria")
         tempChart.data = LineData(dataset)
         tempChart.invalidate()
     }
@@ -67,6 +54,7 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
     }
 
     private fun configureTempChart() {
+        tempChart.xAxis.granularity = 1F
         tempChart.setPinchZoom(true)
         tempChart.isAutoScaleMinMaxEnabled = true
     }
