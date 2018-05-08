@@ -3,6 +3,8 @@ package es.atrujillo.termohome.app.activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Switch
@@ -15,15 +17,19 @@ import es.atrujillo.termohome.app.service.PowerStateChangeObserver
 import es.atrujillo.termohome.common.extension.logWarn
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_POWER_KEY
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_TEMPERATURE_KEY
+import es.atrujillo.termohome.common.model.firebase.LimitData
 import kotlinx.android.synthetic.main.activity_termo.*
 import java.text.DecimalFormat
+import java.util.*
 
 
 class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListener {
 
     private var temperature: Float? = null
+    private var limits: LimitData? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +40,12 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
         FirebaseDatabase.getInstance().getReference(FIREBASE_TEMPERATURE_KEY).addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference(FIREBASE_ACTIVE_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FIREBASE_LIMITS_KEY).addValueEventListener(this)
 
         activeSwitch.setOnClickListener(this)
         stateSwitch.setOnClickListener(this)
         toChartsButton.setOnClickListener(this)
+        setLimitsListeners()
     }
 
     override fun onCancelled(e: DatabaseError) {
@@ -47,6 +55,13 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
     override fun onDataChange(snapshot: DataSnapshot) {
         val key = FirebaseKeys.buildFromKey(snapshot.key)
         when (key) {
+            FirebaseKeys.LIMITS -> {
+                limits = snapshot.getValue(LimitData::class.java)
+                if (limits != null) {
+                    minEdit.setText(limits!!.min.toString())
+                    maxEdit.setText(limits!!.max.toString())
+                }
+            }
             FirebaseKeys.TEMPERATURE -> {
                 temperature = snapshot.getValue(Float::class.java)
                 if (temperature != null)
@@ -77,4 +92,43 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
             R.id.toChartsButton -> startActivity(Intent(this, TermoChartActivity::class.java))
         }
     }
+
+    private fun setLimitsListeners() {
+        lateinit var inputTimer: Timer
+        minEdit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                inputTimer = Timer()
+                inputTimer.schedule(object : TimerTask() {
+                    override fun run() {
+                        if (s != null && s.isNotEmpty()) {
+                            val minValue = s.toString().toInt()
+                            if (minValue != limits?.min)
+                                FirebaseDatabase.getInstance().getReference("limits/min").setValue(minValue)
+                        }
+                    }
+                }, 500)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+        maxEdit.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                inputTimer = Timer()
+                inputTimer.schedule(object : TimerTask() {
+                    override fun run() {
+                        if (s != null && s.isNotEmpty()) {
+                            val maxValue = s.toString().toInt()
+                            if (maxValue != limits?.max)
+                                FirebaseDatabase.getInstance().getReference("limits/max").setValue(maxValue)
+                        }
+                    }
+                }, 500)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+    }
+
 }

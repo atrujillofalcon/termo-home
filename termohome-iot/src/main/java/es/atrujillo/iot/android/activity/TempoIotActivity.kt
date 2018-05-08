@@ -8,11 +8,13 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.hardware.SensorManager.DynamicSensorCallback
 import android.os.Bundle
+import com.google.android.things.update.UpdatePolicy
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import es.atrujillo.iot.android.R
+import es.atrujillo.iot.android.hardware.HardwareManager
 import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
@@ -58,6 +60,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.display_temperature)
+        HardwareManager.setUpdateUpdateManagerPolicy(UpdatePolicy.POLICY_APPLY_AND_REBOOT)
 
         FirebaseDatabase.getInstance().getReference(FIREBASE_LIMITS_KEY).addValueEventListener(this)
         FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
