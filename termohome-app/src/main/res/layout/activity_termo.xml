@@ -166,11 +166,19 @@
 
         </LinearLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/toChartsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:src="@drawable/ic_analytics"
             android:text="Grafico de temperatura" />
+
+       <!-- <com.google.android.material.button.MaterialButton
+            android:id="@+id/material_button"
+            style="@style/Widget.MaterialComponents.MaterialButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_label_enabled" />-->
 
     </LinearLayout>
 </LinearLayout>
