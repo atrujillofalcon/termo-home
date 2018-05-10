@@ -2,6 +2,7 @@ package es.atrujillo.termohome.app.activity
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.firebase.database.DataSnapshot
@@ -52,6 +53,11 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
                 "Temperatura Promedio Diaria")
         tempChart.data = LineData(dataset)
         tempChart.invalidate()
+
+        if (loader.visibility != View.GONE) {
+            loader.visibility = View.GONE
+            tempChart.visibility = View.VISIBLE
+        }
     }
 
     private fun getCalendarFromEpoch(epochMs: Long): Calendar {

@@ -9,8 +9,16 @@
     tools:context=".activity.TermoChartActivity"
     tools:showIn="@layout/activity_chart">
 
+    <ProgressBar
+        android:id="@+id/loader"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="128dp" />
+
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/tempChart"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
