@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -21,164 +22,173 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="5.5"
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Temperatura:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/temperatureTV"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textColor="#1a37dc"
-                android:textSize="16sp" />
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Temperatura:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/temperatureTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:textColor="#1a37dc"
+                    android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_weight="2"
-                android:text="Min/Max:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/minEdit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:textColor="#1a37dc"
-                android:textSize="16sp" />
-
-            <EditText
-                android:id="@+id/maxEdit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:textColor="#1a37dc"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Min:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/minTV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textColor="#1a37dc"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Max:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/maxTV"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textColor="#1a37dc"
-                android:textSize="16sp" />
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:layout_weight="2"
+                    android:text="Min/Max:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
+
+                <EditText
+                    android:id="@+id/minEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:textColor="#1a37dc"
+                    android:textSize="16sp" />
+
+                <EditText
+                    android:id="@+id/maxEdit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:textColor="#1a37dc"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Min:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/minTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:textColor="#1a37dc"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Max:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/maxTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:textColor="#1a37dc"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Modo Automático:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
+
+                <Switch
+                    android:id="@+id/activeSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:text="Estado Aire:"
+                    android:textColor="#1a37dc"
+                    android:textSize="24sp" />
+
+                <Switch
+                    android:id="@+id/stateSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp"
+                    android:enabled="false" />
+
+            </LinearLayout>
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:orientation="vertical">
 
-            <TextView
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/toChartsButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
                 android:layout_margin="16dp"
-                android:text="Modo Automático:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
-
-            <Switch
-                android:id="@+id/activeSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp" />
+                android:src="@drawable/ic_bar_chart_white"
+                app:fabSize="normal" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:text="Estado Aire:"
-                android:textColor="#1a37dc"
-                android:textSize="24sp" />
-
-            <Switch
-                android:id="@+id/stateSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:enabled="false" />
-
-        </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/toChartsButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_analytics"
-            android:text="Grafico de temperatura" />
-
-       <!-- <com.google.android.material.button.MaterialButton
-            android:id="@+id/material_button"
-            style="@style/Widget.MaterialComponents.MaterialButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_label_enabled" />-->
-
     </LinearLayout>
 </LinearLayout>
