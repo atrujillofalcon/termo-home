@@ -3,6 +3,7 @@ package es.atrujillo.termohome.app.activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.firebase.database.DataSnapshot
@@ -15,6 +16,8 @@ import es.atrujillo.termohome.common.model.firebase.TermoHistoricCalendarData
 import es.atrujillo.termohome.common.model.firebase.TermoHistoricRawData
 import kotlinx.android.synthetic.main.activity_chart.*
 import kotlinx.android.synthetic.main.content_termo_chart.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.stream.Collectors
 
@@ -31,7 +34,6 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
 
         FirebaseDatabase.getInstance()
                 .getReference("historic/data")
-//                .limitToLast(100)
                 .addValueEventListener(this)
 
         configureTempChart()
@@ -49,14 +51,26 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
                 .filter(Objects::nonNull)
                 .map { TermoHistoricCalendarData(getCalendarFromEpoch(it!!.ms), it.temperature) }
 
-        val dataset = LineDataSet(HistoricToEntryProcessor.getMonthlyEntries(historicCaledar, Calendar.getInstance()),
-                "Temperatura Promedio Diaria")
-        tempChart.data = LineData(dataset)
-        tempChart.invalidate()
+        populateChart(historicCaledar, getString(R.string.daily_chart_label),
+                { hisCal: List<TermoHistoricCalendarData>, cal: Calendar ->
+                    HistoricToEntryProcessor.getMonthlyEntries(hisCal, cal)
+                })
 
-        if (loader.visibility != View.GONE) {
-            loader.visibility = View.GONE
-            tempChart.visibility = View.VISIBLE
+    }
+
+    private fun populateChart(data: List<TermoHistoricCalendarData>, label: String,
+                              getDailyEntries: suspend (data: List<TermoHistoricCalendarData>,
+                                                        filterCal: Calendar) -> List<Entry>) {
+        launch(UI) {
+            val dataset = LineDataSet(getDailyEntries(data, Calendar.getInstance()), label)
+
+            tempChart.data = LineData(dataset)
+            tempChart.invalidate()
+
+            if (loader.visibility != View.GONE) {
+                loader.visibility = View.GONE
+                tempChart.visibility = View.VISIBLE
+            }
         }
     }
 
