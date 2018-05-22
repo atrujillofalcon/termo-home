@@ -21,7 +21,7 @@ import kotlinx.coroutines.experimental.launch
 import java.util.*
 import java.util.stream.Collectors
 
-class TermoChartActivity : AppCompatActivity(), ValueEventListener {
+class TermoChartActivity : AppCompatActivity(), ValueEventListener, View.OnClickListener {
 
     private lateinit var historicRaw: List<TermoHistoricRawData?>
     private lateinit var historicCaledar: List<TermoHistoricCalendarData>
@@ -37,6 +37,8 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
                 .addValueEventListener(this)
 
         configureTempChart()
+        daily.setOnClickListener(this)
+        monthly.setOnClickListener(this)
     }
 
     override fun onCancelled(e: DatabaseError) {}
@@ -86,4 +88,19 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener {
         tempChart.isAutoScaleMinMaxEnabled = true
     }
 
+    override fun onClick(v: View) {
+        tempChart.visibility = View.GONE
+        loader.visibility = View.VISIBLE
+
+        when (v.id) {
+            monthly.id -> populateChart(historicCaledar, getString(R.string.daily_chart_label),
+                    { hisCal: List<TermoHistoricCalendarData>, cal: Calendar ->
+                        HistoricToEntryProcessor.getMonthlyEntries(hisCal, cal)
+                    })
+            daily.id -> populateChart(historicCaledar, getString(R.string.daily_chart_label),
+                    { hisCal: List<TermoHistoricCalendarData>, cal: Calendar ->
+                        HistoricToEntryProcessor.getDailyEntries(hisCal, cal)
+                    })
+        }
+    }
 }
