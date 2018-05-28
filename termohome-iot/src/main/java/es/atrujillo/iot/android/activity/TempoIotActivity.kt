@@ -18,6 +18,7 @@ import es.atrujillo.iot.android.hardware.HardwareManager
 import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
+import es.atrujillo.termohome.common.extension.logDebug
 import es.atrujillo.termohome.common.extension.logInfo
 import es.atrujillo.termohome.common.extension.logWarn
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
@@ -118,11 +119,11 @@ class TempoIotActivity : Activity(), ValueEventListener {
         val engineActive = if (isEngineActive != null) isEngineActive!! else false
         if (engineActive && limits != null && powerOn != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
-            if (isIdleIntervalDone() && powerOn as Boolean && tempValue in limits!!.min..limits!!.max) {
+            if (isIdleIntervalDone() && (powerOn as Boolean) && tempValue in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
-            else if (isIdleIntervalDone() && !powerOn!! && (tempValue < limits!!.min || tempValue > limits!!.max)) {
+            else if (isIdleIntervalDone() && !(powerOn as Boolean) && tempValue !in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(true)
             }
         }
@@ -141,7 +142,9 @@ class TempoIotActivity : Activity(), ValueEventListener {
     }
 
     private fun isIdleIntervalDone(): Boolean {
-        return ChronoUnit.MINUTES.between(lastChangeState, LocalDateTime.now()) > idleInterval
+        val curInterval = ChronoUnit.MINUTES.between(lastChangeState, LocalDateTime.now())
+        logDebug("Current Interval: $curInterval of idle: $idleInterval")
+        return curInterval > idleInterval
     }
 
     override fun onCancelled(e: DatabaseError) {

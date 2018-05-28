@@ -2,6 +2,11 @@ package es.atrujillo.termohome.common.extension
 
 import android.util.Log
 
+fun Any.logDebug(msg: String?) {
+    if (msg != null)
+        Log.d(this::class.simpleName, msg)
+}
+
 fun Any.logInfo(msg: String?) {
     if (msg != null)
         Log.i(this::class.simpleName, msg)
