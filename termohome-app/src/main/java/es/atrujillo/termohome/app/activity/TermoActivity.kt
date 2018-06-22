@@ -53,36 +53,37 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
     }
 
     override fun onDataChange(snapshot: DataSnapshot) {
-        val key = FirebaseKeys.buildFromKey(snapshot.key)
-        when (key) {
-            FirebaseKeys.LIMITS -> {
-                limits = snapshot.getValue(LimitData::class.java)
-                if (limits != null) {
-                    minEdit.setText(limits!!.min.toString())
-                    maxEdit.setText(limits!!.max.toString())
+        if (snapshot.key != null) {
+            val key = FirebaseKeys.buildFromKey(snapshot.key!!)
+            when (key) {
+                FirebaseKeys.LIMITS -> {
+                    limits = snapshot.getValue(LimitData::class.java)
+                    if (limits != null) {
+                        minEdit.setText(limits!!.min.toString())
+                        maxEdit.setText(limits!!.max.toString())
+                    }
                 }
-            }
-            FirebaseKeys.TEMPERATURE -> {
-                temperature = snapshot.getValue(Float::class.java)
-                if (temperature != null)
-                    temperatureTV.text = "${DecimalFormat("##.##").format(temperature)} ºC"
-            }
-            FirebaseKeys.POWER -> stateSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
-            FirebaseKeys.ACTIVE -> {
-                activeSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
-                activeSwitch.invalidate()
+                FirebaseKeys.TEMPERATURE -> {
+                    temperature = snapshot.getValue(Float::class.java)
+                    if (temperature != null)
+                        temperatureTV.text = "${DecimalFormat("##.##").format(temperature)} ºC"
+                }
+                FirebaseKeys.POWER -> stateSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
+                FirebaseKeys.ACTIVE -> {
+                    activeSwitch.isChecked = snapshot.getValue(Boolean::class.java)!!
+                    activeSwitch.invalidate()
 
-                stateSwitch.isEnabled = !activeSwitch.isChecked
-                stateSwitch.invalidate()
+                    stateSwitch.isEnabled = !activeSwitch.isChecked
+                    stateSwitch.invalidate()
+                }
+                else -> Log.w("TermoActivity", "Not found Firebase key")
             }
-            else -> Log.w("TermoActivity", "Not found Firebase key")
+
+            if (loader.visibility != View.GONE) {
+                loader.visibility = View.GONE
+                viewsContainer.visibility = View.VISIBLE
+            }
         }
-
-        if (loader.visibility != View.GONE) {
-            loader.visibility = View.GONE
-            viewsContainer.visibility = View.VISIBLE
-        }
-
     }
 
     override fun onClick(v: View) {

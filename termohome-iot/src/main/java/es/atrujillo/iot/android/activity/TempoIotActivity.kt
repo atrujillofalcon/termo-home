@@ -22,6 +22,7 @@ import es.atrujillo.termohome.common.extension.logDebug
 import es.atrujillo.termohome.common.extension.logInfo
 import es.atrujillo.termohome.common.extension.logWarn
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
+import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.*
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_IDLE_KEY
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
@@ -100,13 +101,15 @@ class TempoIotActivity : Activity(), ValueEventListener {
             val now = LocalDateTime.now()
             val currentSecond = now.second
             if (currentSecond != lastReadSecond && currentSecond % 5 == 0) {
-                temperatureTV.text = "${DecimalFormat("##.##").format(event.values[0])} ºC"
+                val temperature = event.values[0]
+                temperatureTV.text = "${DecimalFormat("##.##").format(temperature)} ºC"
 
-                logInfo("sensor changed: ${event.values[0]}")
+                logInfo("sensor changed: ${temperature}")
                 lastReadSecond = currentSecond
 
-                processTemperatureData(event.values[0])
-                saveDataToFirebase(now, event.values[0])
+                processTemperatureData(temperature)
+                saveDataToFirebase(now, temperature)
+
             }
         }
 
@@ -119,13 +122,15 @@ class TempoIotActivity : Activity(), ValueEventListener {
         val engineActive = if (isEngineActive != null) isEngineActive!! else false
         if (engineActive && limits != null && powerOn != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
-            if (isIdleIntervalDone() && (powerOn as Boolean) && tempValue in limits!!.getRange()) {
+            if (isIdleIntervalDone() && isPowerOn() && tempValue in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
-            else if (isIdleIntervalDone() && !(powerOn as Boolean) && tempValue !in limits!!.getRange()) {
+            else if (isIdleIntervalDone() && !isPowerOn() && tempValue !in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(true)
             }
+
+            if (tempValue <= limits!!.getMiddle()) lastChangeState = LocalDateTime.now() //actualmente solo verano, pendiente convertir genérico
         }
     }
 
@@ -147,30 +152,34 @@ class TempoIotActivity : Activity(), ValueEventListener {
         return curInterval > idleInterval
     }
 
+    private fun isPowerOn(): Boolean = powerOn ?: false
+
     override fun onCancelled(e: DatabaseError) {
         logWarn(e.message)
     }
 
     override fun onDataChange(snapshot: DataSnapshot) {
-        val key = FirebaseKeys.buildFromKey(snapshot.key)
-        when (key) {
-            FirebaseKeys.LIMITS -> limits = snapshot.getValue(LimitData::class.java)
-            FirebaseKeys.POWER -> {
-                if (powerOn != null)
-                    lastChangeState = LocalDateTime.now()  //ignoramos la primera vez
+        if (snapshot.key != null) {
+            val key = FirebaseKeys.buildFromKey(snapshot.key!!)
+            when (key) {
+                LIMITS -> limits = snapshot.getValue(LimitData::class.java)
+                POWER -> {
+                    /*if (powerOn != null)
+                        lastChangeState = LocalDateTime.now()  //ignoramos la primera vez*/
 
-                powerOn = snapshot.getValue(Boolean::class.java)
-                if (powerOn as Boolean) {
-                    TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
-                            newState = TPLinkService.TpLinkState.ON)
-                } else {
-                    TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
-                            newState = TPLinkService.TpLinkState.OFF)
+                    powerOn = snapshot.getValue(Boolean::class.java)
+                    if (powerOn as Boolean) {
+                        TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
+                                newState = TPLinkService.TpLinkState.ON)
+                    } else {
+                        TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
+                                newState = TPLinkService.TpLinkState.OFF)
+                    }
                 }
+                IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java)!!
+                ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)!!
+                OTHER -> logWarn("Not found firebase key ${snapshot.key}")
             }
-            FirebaseKeys.IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java)!!
-            FirebaseKeys.ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)!!
-            FirebaseKeys.OTHER -> logWarn("Not found firebase key ${snapshot.key}")
         }
     }
 
