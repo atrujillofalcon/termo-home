@@ -164,8 +164,8 @@ class TempoIotActivity : Activity(), ValueEventListener {
             when (key) {
                 LIMITS -> limits = snapshot.getValue(LimitData::class.java)
                 POWER -> {
-                    /*if (powerOn != null)
-                        lastChangeState = LocalDateTime.now()  //ignoramos la primera vez*/
+                    if (powerOn != null && !isPowerOn())
+                        lastChangeState = LocalDateTime.now()  //ignoramos la primera vez
 
                     powerOn = snapshot.getValue(Boolean::class.java)
                     if (powerOn as Boolean) {
