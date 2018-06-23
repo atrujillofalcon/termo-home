@@ -41,6 +41,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
     private lateinit var mSensorManager: SensorManager
     private var lastReadSecond = 0
     private var lastChangeState = LocalDateTime.MIN
+    private var targetTempLastTime = LocalDateTime.MAX
 
     private var limits: LimitData? = null
     private var powerOn: Boolean? = null
@@ -122,7 +123,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
         val engineActive = if (isEngineActive != null) isEngineActive!! else false
         if (engineActive && limits != null && powerOn != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
-            if (isIdleIntervalDone() && isPowerOn() && tempValue in limits!!.getRange()) {
+            if (isIdleIntervalDone() && isPowerOn() && tempValue in limits!!.getRange() && isTargetTempIntervalDone()) {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
@@ -130,7 +131,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
                 FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(true)
             }
 
-            if (tempValue <= limits!!.getMiddle()) lastChangeState = LocalDateTime.now() //actualmente solo verano, pendiente convertir genérico
+            if (tempValue <= limits!!.getMiddle()) targetTempLastTime = LocalDateTime.now() //actualmente solo verano, pendiente convertir genérico
         }
     }
 
@@ -147,9 +148,15 @@ class TempoIotActivity : Activity(), ValueEventListener {
     }
 
     private fun isIdleIntervalDone(): Boolean {
-        val curInterval = ChronoUnit.MINUTES.between(lastChangeState, LocalDateTime.now())
-        logDebug("Current Interval: $curInterval of idle: $idleInterval")
-        return curInterval > idleInterval
+        val lastChangeInterval = ChronoUnit.MINUTES.between(lastChangeState, LocalDateTime.now())
+        logDebug("Current Interval: $lastChangeInterval of idle: $idleInterval")
+        return lastChangeInterval > idleInterval
+    }
+
+    private fun isTargetTempIntervalDone(): Boolean {
+        val targetTempInterval = ChronoUnit.MINUTES.between(targetTempLastTime, LocalDateTime.now())
+        logDebug("Current Interval: $targetTempInterval of temp: $idleInterval")
+        return targetTempInterval > idleInterval
     }
 
     private fun isPowerOn(): Boolean = powerOn ?: false
