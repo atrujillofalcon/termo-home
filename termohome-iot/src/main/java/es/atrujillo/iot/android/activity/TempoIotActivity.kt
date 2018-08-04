@@ -23,10 +23,6 @@ import es.atrujillo.termohome.common.extension.logInfo
 import es.atrujillo.termohome.common.extension.logWarn
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.*
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_IDLE_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_POWER_KEY
 import es.atrujillo.termohome.common.model.firebase.LimitData
 import es.atrujillo.termohome.common.model.firebase.TermoHistoricRawData
 import kotlinx.android.synthetic.main.display_temperature.*
@@ -47,6 +43,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
     private var powerOn: Boolean? = null
     private var isEngineActive: Boolean? = null
     private var idleInterval: Long = 30
+    private var target: Long = 23
 
     private val mDynamicSensorCallback = object : DynamicSensorCallback() {
         override fun onDynamicSensorConnected(sensor: Sensor) {
@@ -65,10 +62,11 @@ class TempoIotActivity : Activity(), ValueEventListener {
         setContentView(R.layout.display_temperature)
         HardwareManager.setUpdateUpdateManagerPolicy(UpdatePolicy.POLICY_APPLY_AND_REBOOT)
 
-        FirebaseDatabase.getInstance().getReference(FIREBASE_LIMITS_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_IDLE_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_ACTIVE_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(LIMITS.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(POWER.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(IDLE_INTERVAL.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(ACTIVE.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(TARGET.key).addValueEventListener(this)
 
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
@@ -124,11 +122,11 @@ class TempoIotActivity : Activity(), ValueEventListener {
         if (engineActive && limits != null && powerOn != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
             if (isIdleIntervalDone() && isPowerOn() && tempValue in limits!!.getRange() && isTargetTempIntervalDone()) {
-                FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(false)
+                FirebaseDatabase.getInstance().getReference(POWER.key).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
             else if (isIdleIntervalDone() && !isPowerOn() && tempValue !in limits!!.getRange()) {
-                FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).setValue(true)
+                FirebaseDatabase.getInstance().getReference(POWER.key).setValue(true)
             }
 
             if (tempValue <= limits!!.getMiddle()) targetTempLastTime = LocalDateTime.now() //actualmente solo verano, pendiente convertir genérico
@@ -183,9 +181,10 @@ class TempoIotActivity : Activity(), ValueEventListener {
                                 newState = TPLinkService.TpLinkState.OFF)
                     }
                 }
-                IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java)!!
-                ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)!!
-                OTHER -> logWarn("Not found firebase key ${snapshot.key}")
+                IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java) ?: 30
+                ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)
+                TARGET -> target = snapshot.getValue(Long::class.java) ?: 23
+                else -> logWarn("Not found firebase key ${snapshot.key}")
             }
         }
     }

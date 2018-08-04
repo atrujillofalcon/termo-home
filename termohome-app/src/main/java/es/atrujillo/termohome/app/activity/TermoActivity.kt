@@ -16,10 +16,6 @@ import es.atrujillo.termohome.app.R
 import es.atrujillo.termohome.app.service.PowerStateChangeObserver
 import es.atrujillo.termohome.common.extension.logWarn
 import es.atrujillo.termohome.common.model.firebase.FirebaseKeys
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_ACTIVE_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_LIMITS_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_POWER_KEY
-import es.atrujillo.termohome.common.model.firebase.FirebaseKeys.Companion.FIREBASE_TEMPERATURE_KEY
 import es.atrujillo.termohome.common.model.firebase.LimitData
 import kotlinx.android.synthetic.main.activity_termo.*
 import java.text.DecimalFormat
@@ -37,10 +33,10 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
 
         startService(Intent(this, PowerStateChangeObserver::class.java))
 
-        FirebaseDatabase.getInstance().getReference(FIREBASE_TEMPERATURE_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_POWER_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_ACTIVE_KEY).addValueEventListener(this)
-        FirebaseDatabase.getInstance().getReference(FIREBASE_LIMITS_KEY).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FirebaseKeys.TEMPERATURE.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FirebaseKeys.POWER.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FirebaseKeys.ACTIVE.key).addValueEventListener(this)
+        FirebaseDatabase.getInstance().getReference(FirebaseKeys.LIMITS.key).addValueEventListener(this)
 
         activeSwitch.setOnClickListener(this)
         stateSwitch.setOnClickListener(this)
