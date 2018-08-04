@@ -15,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import es.atrujillo.iot.android.R
 import es.atrujillo.iot.android.hardware.HardwareManager
+import es.atrujillo.iot.android.model.FirebaseBoolean
 import es.atrujillo.iot.android.networking.TPLinkService
 import es.atrujillo.iot.android.networking.TPLinkServiceClient
 import es.atrujillo.iot.android.service.TemperaturePressureService
@@ -37,11 +38,12 @@ class TempoIotActivity : Activity(), ValueEventListener {
     private lateinit var mSensorManager: SensorManager
     private var lastReadSecond = 0
     private var lastChangeState = LocalDateTime.MIN
-    private var targetTempLastTime = LocalDateTime.MAX
+    private var lastTargetReached: LocalDateTime? = null
+    private var isTargetReached = false
 
     private var limits: LimitData? = null
-    private var powerOn: Boolean? = null
-    private var isEngineActive: Boolean? = null
+    private var powerOn: FirebaseBoolean = FirebaseBoolean.Uninitialized()
+    private var isEngineActive = false
     private var idleInterval: Long = 30
     private var target: Long = 23
 
@@ -103,7 +105,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
                 val temperature = event.values[0]
                 temperatureTV.text = "${DecimalFormat("##.##").format(temperature)} ºC"
 
-                logInfo("sensor changed: ${temperature}")
+                logInfo("sensor changed: $temperature")
                 lastReadSecond = currentSecond
 
                 processTemperatureData(temperature)
@@ -118,18 +120,20 @@ class TempoIotActivity : Activity(), ValueEventListener {
     }
 
     private fun processTemperatureData(tempValue: Float) {
-        val engineActive = if (isEngineActive != null) isEngineActive!! else false
-        if (engineActive && limits != null && powerOn != null) {
+        if (!isTargetReached && tempValue < target) {
+            isTargetReached = true
+            lastTargetReached = LocalDateTime.now()
+        }
+
+        if (isEngineActive && limits != null) {
             //si está encendido y la temperatura está en los rangos normales activar trigger
-            if (isIdleIntervalDone() && isPowerOn() && tempValue in limits!!.getRange() && isTargetTempIntervalDone()) {
+            if (isIdleIntervalDone() && powerOn is FirebaseBoolean.True && tempValue in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(POWER.key).setValue(false)
             }
             //si está apagado y la temperatura está fuera de rango
-            else if (isIdleIntervalDone() && !isPowerOn() && tempValue !in limits!!.getRange()) {
+            else if (isIdleIntervalDone() && powerOn is FirebaseBoolean.False && tempValue !in limits!!.getRange()) {
                 FirebaseDatabase.getInstance().getReference(POWER.key).setValue(true)
             }
-
-            if (tempValue <= limits!!.getMiddle()) targetTempLastTime = LocalDateTime.now() //actualmente solo verano, pendiente convertir genérico
         }
     }
 
@@ -146,18 +150,13 @@ class TempoIotActivity : Activity(), ValueEventListener {
     }
 
     private fun isIdleIntervalDone(): Boolean {
-        val lastChangeInterval = ChronoUnit.MINUTES.between(lastChangeState, LocalDateTime.now())
+        if (isEngineActive && lastTargetReached == null) return false
+
+        val lastChangeTime = if (isEngineActive) lastTargetReached else lastChangeState
+        val lastChangeInterval = ChronoUnit.MINUTES.between(lastChangeTime, LocalDateTime.now())
         logDebug("Current Interval: $lastChangeInterval of idle: $idleInterval")
         return lastChangeInterval > idleInterval
     }
-
-    private fun isTargetTempIntervalDone(): Boolean {
-        val targetTempInterval = ChronoUnit.MINUTES.between(targetTempLastTime, LocalDateTime.now())
-        logDebug("Current Interval: $targetTempInterval of temp: $idleInterval")
-        return targetTempInterval > idleInterval
-    }
-
-    private fun isPowerOn(): Boolean = powerOn ?: false
 
     override fun onCancelled(e: DatabaseError) {
         logWarn(e.message)
@@ -169,20 +168,20 @@ class TempoIotActivity : Activity(), ValueEventListener {
             when (key) {
                 LIMITS -> limits = snapshot.getValue(LimitData::class.java)
                 POWER -> {
-                    if (powerOn != null && !isPowerOn())
+                    if (powerOn !is FirebaseBoolean.Uninitialized)
                         lastChangeState = LocalDateTime.now()  //ignoramos la primera vez
 
-                    powerOn = snapshot.getValue(Boolean::class.java)
-                    if (powerOn as Boolean) {
+                    powerOn = FirebaseBoolean.buildFromBoolean(snapshot.getValue(Boolean::class.java))
+                    if (powerOn is FirebaseBoolean.True) {
                         TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
                                 newState = TPLinkService.TpLinkState.ON)
-                    } else {
+                    } else if (powerOn is FirebaseBoolean.False) {
                         TPLinkServiceClient().setDeviceState(deviceId = TPLinkService.AIR_DEVICE_ID,
                                 newState = TPLinkService.TpLinkState.OFF)
                     }
                 }
                 IDLE_INTERVAL -> idleInterval = snapshot.getValue(Long::class.java) ?: 30
-                ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java)
+                ACTIVE -> isEngineActive = snapshot.getValue(Boolean::class.java) ?: false
                 TARGET -> target = snapshot.getValue(Long::class.java) ?: 23
                 else -> logWarn("Not found firebase key ${snapshot.key}")
             }

@@ -110,12 +110,12 @@ class TermoActivity : AppCompatActivity(), ValueEventListener, View.OnClickListe
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         maxEdit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
+            override fun afterTextChanged(text: Editable?) {
                 inputTimer = Timer()
                 inputTimer.schedule(object : TimerTask() {
                     override fun run() {
-                        if (s != null && s.isNotEmpty()) {
-                            val maxValue = s.toString().toInt()
+                        if (text != null && text.isNotEmpty()) {
+                            val maxValue = text.toString().toInt()
                             if (maxValue != limits?.max)
                                 FirebaseDatabase.getInstance().getReference("limits/max").setValue(maxValue)
                         }
