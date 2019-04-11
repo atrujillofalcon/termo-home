@@ -31,7 +31,7 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
 
 //    networking libraries
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.14.1'
     implementation 'com.squareup.moshi:moshi:1.5.0'
     implementation 'com.squareup.moshi:moshi-kotlin:1.5.0'
 
