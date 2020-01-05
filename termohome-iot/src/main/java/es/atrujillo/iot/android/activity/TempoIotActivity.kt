@@ -74,7 +74,7 @@ class TempoIotActivity : Activity(), ValueEventListener {
         val sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL)
         logInfo("Sensor count ${sensors.size}")
         for (s in sensors) {
-            logInfo("Sensor name: ${s.name}")
+            logInfo("Sensor name:  ${s.name}")
         }
         startTemperaturePressureRequest()
     }

@@ -16,8 +16,9 @@ import es.atrujillo.termohome.common.model.firebase.TermoHistoricCalendarData
 import es.atrujillo.termohome.common.model.firebase.TermoHistoricRawData
 import kotlinx.android.synthetic.main.activity_chart.*
 import kotlinx.android.synthetic.main.content_termo_chart.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.stream.Collectors
 
@@ -63,7 +64,7 @@ class TermoChartActivity : AppCompatActivity(), ValueEventListener, View.OnClick
     private fun populateChart(data: List<TermoHistoricCalendarData>, label: String,
                               getDailyEntries: suspend (data: List<TermoHistoricCalendarData>,
                                                         filterCal: Calendar) -> List<Entry>) {
-        launch(UI) {
+        GlobalScope.launch(Dispatchers.Main) {
             val dataset = LineDataSet(getDailyEntries(data, Calendar.getInstance()), label)
 
             tempChart.data = LineData(dataset)

@@ -13,7 +13,7 @@ private val TAG = TemperaturePressureService::class.java.simpleName
 private val I2C_BUS = "I2C1"
 
 /**
- * To use this service, start it from your component (like an activity):
+ * To use this service, start it from  your component (like an activity):
  * <pre>{@code
  * this.startService(Intent(this, TemperaturePressureService::class.java))
  * }</pre>
@@ -35,7 +35,7 @@ class TemperaturePressureService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        return Service.START_NOT_STICKY
+        return START_NOT_STICKY
     }
 
     private fun setupTemperaturePressureSensor() {
